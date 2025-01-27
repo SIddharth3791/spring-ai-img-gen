@@ -9,5 +9,7 @@ public interface OpenAiService {
 	byte[] getImage(Question question);
 	
 	String getDescription(MultipartFile file);
+	
+	byte[] getSpeech(Question question);
 
 }

@@ -10,11 +10,15 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.model.Media;
+import org.springframework.ai.openai.OpenAiAudioSpeechModel;
+import org.springframework.ai.openai.OpenAiAudioSpeechOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.openai.api.OpenAiAudioApi;
+import org.springframework.ai.openai.audio.speech.SpeechPrompt;
+import org.springframework.ai.openai.audio.speech.SpeechResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +31,8 @@ public class OpenAiServiceImpl implements OpenAiService {
 	private final ImageModel imageModel;
 	
 	private final ChatModel chatModel;
+	
+	private final OpenAiAudioSpeechModel aiAudioSpeechModel;
 	
 	@Value("${img.response-format}")
 	private String responseFormat;
@@ -47,9 +53,10 @@ public class OpenAiServiceImpl implements OpenAiService {
 	private String imgStyle;
 	
 	
-	public OpenAiServiceImpl(ImageModel imageModel, ChatModel chatModel) {
+	public OpenAiServiceImpl(ImageModel imageModel, ChatModel chatModel, OpenAiAudioSpeechModel aiAudioSpeechModel) {
 		this.imageModel = imageModel;
 		this.chatModel = chatModel;
+		this.aiAudioSpeechModel = aiAudioSpeechModel;
 	}
 
 	@Override
@@ -78,6 +85,23 @@ public class OpenAiServiceImpl implements OpenAiService {
 		
 		ChatResponse response = chatModel.call(new Prompt(List.of(userMsg), chatOptions));
 		return response.getResult().getOutput().toString();
+	}
+
+	@Override
+	public byte[] getSpeech(Question question) {
+		
+		OpenAiAudioSpeechOptions speechOptions = OpenAiAudioSpeechOptions.builder()
+												.voice(OpenAiAudioApi.SpeechRequest.Voice.NOVA)
+												.speed(1.0f)
+												.responseFormat(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.MP3)
+												.model(OpenAiAudioApi.TtsModel.TTS_1.value)
+												.build();
+		
+		SpeechPrompt speechPrompt = new SpeechPrompt(question.question(), speechOptions);
+		
+		SpeechResponse response = aiAudioSpeechModel.call(speechPrompt);
+		
+		return response.getResult().getOutput();
 	}
 
 }
