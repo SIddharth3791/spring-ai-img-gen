@@ -4,3 +4,11 @@ spring:
  ai:
   openai:
    api-key: ${OPENAI_API_KEY}
+   
+img:
+ response-format: b64_json
+ model-type: dall-e-3 ##Deafult is dall-e-2
+ height: 1024
+ width: 1024
+ quality: hd  ##Default is standard
+ style: natural ##Deafult is vivid

@@ -18,8 +18,8 @@ public class ImageGenController {
 	}
 	
 	@PostMapping(value ="/image", produces = MediaType.IMAGE_PNG_VALUE)
-	public Byte[] getImage(@RequestBody Question question) {
-		return null;
+	public byte[] getImage(@RequestBody Question question) {
+		return openAiService.getImage(question);
 	}
 
 }
