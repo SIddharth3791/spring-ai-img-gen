@@ -104,6 +104,14 @@ public class OpenAiServiceImpl implements OpenAiService {
 		return response.getResult().getOutput();
 	}
 
+	@Override
+	public byte[] explainMe(MultipartFile file) {
+		
+		Question imageQuestion = new Question(getDescription(file));
+		
+		return getSpeech(imageQuestion);
+	}
+
 }
 
 

@@ -11,5 +11,7 @@ public interface OpenAiService {
 	String getDescription(MultipartFile file);
 	
 	byte[] getSpeech(Question question);
+	
+	byte[] explainMe(MultipartFile file);
 
 }
