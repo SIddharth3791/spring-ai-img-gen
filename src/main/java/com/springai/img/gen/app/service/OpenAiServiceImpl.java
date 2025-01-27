@@ -1,12 +1,23 @@
 package com.springai.img.gen.app.service;
 
 import java.util.Base64;
+import java.util.List;
 
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.model.Media;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.springai.img.gen.app.model.Question;
 
@@ -14,6 +25,8 @@ import com.springai.img.gen.app.model.Question;
 public class OpenAiServiceImpl implements OpenAiService {
 	
 	private final ImageModel imageModel;
+	
+	private final ChatModel chatModel;
 	
 	@Value("${img.response-format}")
 	private String responseFormat;
@@ -33,8 +46,10 @@ public class OpenAiServiceImpl implements OpenAiService {
 	@Value("${img.style}")
 	private String imgStyle;
 	
-	public OpenAiServiceImpl(ImageModel imageModel) {
+	
+	public OpenAiServiceImpl(ImageModel imageModel, ChatModel chatModel) {
 		this.imageModel = imageModel;
+		this.chatModel = chatModel;
 	}
 
 	@Override
@@ -55,4 +70,30 @@ public class OpenAiServiceImpl implements OpenAiService {
 		return Base64.getDecoder().decode(imageResponse.getResult().getOutput().getB64Json());
 	}
 
+	@Override
+	public String getDescription(MultipartFile file) {
+		var chatOptions = OpenAiChatOptions.builder().model(OpenAiApi.ChatModel.GPT_4_TURBO).build();
+		
+		var userMsg =  new UserMessage("Explain what do you see in the picture?", List.of(new Media(MimeTypeUtils.IMAGE_JPEG, file.getResource())));
+		
+		ChatResponse response = chatModel.call(new Prompt(List.of(userMsg), chatOptions));
+		return response.getResult().getOutput().toString();
+	}
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

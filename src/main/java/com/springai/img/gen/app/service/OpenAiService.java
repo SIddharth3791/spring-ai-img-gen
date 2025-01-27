@@ -1,6 +1,5 @@
 package com.springai.img.gen.app.service;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.springai.img.gen.app.model.Question;
@@ -9,6 +8,6 @@ public interface OpenAiService {
 	
 	byte[] getImage(Question question);
 	
-	ResponseEntity<String> getDescription(MultipartFile file);
+	String getDescription(MultipartFile file);
 
 }
